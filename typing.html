@@ -1,0 +1,173 @@
+<!doctype html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>タイピングアプリ</title>
+    <style> /* css */
+        body {
+            font-size: 6em;
+            text-align: center;
+        }
+        
+        #count {
+            margin: 0;
+            font-weight: bold;
+            color: #888;
+        }
+        
+        #wrap {
+            margin-top: 20px;
+            padding: 20px 10px;
+            background-color: #666;
+            font-weight: bold;
+            color: #fff;
+        }
+        
+        span { /* ↓　spanのCSSがかかる時間を指定し動きのあるアニメーションに　*/
+            transition: all 300ms 0s ease;
+        }
+        
+        .add-color {
+            font-size: 0.5em;
+            color: #666;
+        }
+    </style>
+    
+</head>
+<!----------------body------------------>
+<body>
+    <p id="count">60</p><!--制限時間-->
+    <div id="wrap">
+        <p id="text"></p><!--文字表示-->
+    </div>
+    <button id="start">スタート</button><!--スタートボタン-->
+    
+    
+    <script> // jabascript
+    
+    //必要なHTML要素の取得
+    const wrap = document.getElementById("wrap");
+    const start = document.getElementById("start");
+    
+    //配列
+    const textLists = [　//複数のテキストを格納する配列
+        "Hello Lovely Alto",
+        "You are kitten",
+        "Sey Nya-n?",
+        "Alto Love",
+        "Sleepy Alto",
+        "ALUTO",
+        "nya-nya-!!"
+        
+        
+        ]; 
+    
+    //クリックの度に繰り返す
+    const createText = () => {　//テキストをランダムに画面表示
+      const p = document.getElementById("text");//HTML要素のtextを取得→p
+      p.textContent = "";　//pの中身を空にする
+      
+      const rnd = Math.floor(Math.random() * textLists.length);
+      //配列数分、ランダムで数字表示をする処理をrndに代入
+      //配列数3→0～3未満（つまり0.1.2の3種）の中でランダムする
+      
+      checkTexts = textLists[rnd].split("").map(value => { 
+                   //textListsのrand番目の文字列をsplitで一文字ずつの配列として取得＆mapで1インデックス毎に処理
+      　　
+      　　const span = document.createElement("span"); //新たにspanタグを生成
+      　　span.textContent = value; //spanタグに値を追加
+      　　
+          p.appendChild(span);　//p(つまりHTML要素のtext)の子要素としてspanタグを追加する
+          
+          return span; 
+          //<span>value</span>をchecTextsに配列として格納
+          //consoleに出力すると配列は[span,span,span…]となる
+          //１つずつのspanの中のtextcontent内にvalueの値が取得されていることが分かる
+      })
+        
+    }; 
+    
+    
+    
+    let score = 0; //スコアの初期値を設定
+    
+    //クリック＆キーに入力があると処理が実行される
+    const keyDown = e => { //イベント処理、入力判定（1文字ずつ取得＆真偽に応じた処理）
+        if(e.key === checkTexts[0].textContent) {　
+            //条件：キー入力とテキストの0番目のテキストコンテンツの値が同じ
+            checkTexts[0].className = "add-color"; //配列0番目のspanタグにadd-colorのCSSを追加
+            checkTexts.shift(); //↑のCSS処理後、配列１つ目の要素を削除
+            
+            score++; //正しい時だけスコアの数が増える
+            
+            
+            if(!checkTexts.length) createText(); //配列内のspanが0になったら…
+            
+        }
+       
+    }; 
+    
+    
+    //タイムアウト処理後、確認ダイアログの中身として実行
+    const rankCheck = score => {　//ランク判定＆メッセ表示
+        let text = ""; //変数textを作っておく
+        
+        
+        //scoreによって条件分岐したコメントをtextに代入
+        if(score < 100){
+            text = `あなたのランクはCです。\nBランクまであと${100 - score}文字です。`;
+        }else if(score < 200){
+            text = `あなたのランクはBです。\nAランクまであと${200 - score}文字です。`;
+        }else if(score < 300){
+            text = `あなたのランクはAです。\nSランクまであと${300 - score}文字です。`;
+        }else if(score >= 300){
+            text = `あなたのランクはSです。\nおめでとうございます！`;
+        }
+        
+        
+        return `${score}文字打てました！`;
+       
+        
+    }; 
+   
+     
+    //タイマーが0になったら実行される
+    const gameOver = id => { //ゲーム終了処理（タイムアウト）
+        
+        clearInterval(id);　//インターバルクリア　0より減らない
+        
+        const result = confirm(rankCheck(score));　//確認ダイアログ
+        
+    }; 
+    
+    //クリックされたら実行される
+    const timer = () => {　//タイマー処理
+        let time = 60; 
+        
+        const count = document.getElementById("count");
+        const id = setInterval(() => {
+            
+            if(time <= 0) gameOver(id);　//0になったgameOver()を実行
+            
+            count.textContent = time--; //60秒から-1をcountの子要素にする
+            
+        }, 1000); //1秒ごとに処理を実行
+        
+    }; 
+    
+    //startボタンがクリックされた時の処理
+    start.addEventListener("click", () => {
+        timer(); //タイマーが動き出す
+        createText(); //ランダムで文字が出る
+        
+        start.style.display = "none"; //スタートボタンを非表示にする
+        
+        document.addEventListener("keydown", keyDown);
+        //キーボードに何か入力されると関数keyDown()を実行する
+        
+    }); 
+        
+    </script>
+</body>
+<!----------------body------------------>
+</html>
