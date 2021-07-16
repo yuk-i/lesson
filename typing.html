@@ -93,6 +93,8 @@
     
     //クリック＆キーに入力があると処理が実行される
     const keyDown = e => { //イベント処理、入力判定（1文字ずつ取得＆真偽に応じた処理）
+        wrap.style.backgroundColor = "#666"; //毎回背景グレーに戻す為、初期設定
+    
         if(e.key === checkTexts[0].textContent) {　
             //条件：キー入力とテキストの0番目のテキストコンテンツの値が同じ
             checkTexts[0].className = "add-color"; //配列0番目のspanタグにadd-colorのCSSを追加
@@ -100,9 +102,13 @@
             
             score++; //正しい時だけスコアの数が増える
             
+            if(!checkTexts.length) createText(); //配列内のspanが0になったら別のテキスト表示処理へ
             
-            if(!checkTexts.length) createText(); //配列内のspanが0になったら…
-            
+        }else if(e.key === "Shift"){　//大文字押す時のシフトキーは背景は＃666のまま
+                                    　//キーシフトは「S」大文字！
+            wrap.style.backgroundColor = "#666"; 
+        }else{　//値も同じではなくシフトキーでもない（つまりミス）の場合は背景レッド
+            wrap.style.backgroundColor = "red";
         }
        
     }; 
@@ -125,7 +131,7 @@
         }
         
         
-        return `${score}文字打てました！`;
+        return `${score}文字打てました！\n${text}\n 【OK】リトライ／【キャンセル】終了`;
        
         
     }; 
@@ -137,6 +143,8 @@
         clearInterval(id);　//インターバルクリア　0より減らない
         
         const result = confirm(rankCheck(score));　//確認ダイアログ
+        if(result) window.location.reload(); //リトライでtrueの場合のみリロード処理
+        
         
     }; 
     
